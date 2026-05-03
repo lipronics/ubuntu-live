@@ -14,7 +14,6 @@ RUN apt update && \
      fonts-freefont-ttf \
      gcc \
      ghostscript \
-     git \
      libapache2-mod-php \
      locales \
      nodejs \
@@ -56,3 +55,27 @@ RUN a2dismod php8.3 && \
     phpenmod mbstring
 
 RUN locale-gen nl_NL.utf8
+
+#Install the barcode utility
+RUN wget https://www.lisaas.com/download/genbarcode-0.4.tar.gz && \
+    tar -xvzf genbarcode-0.4.tar.gz && \
+    cd genbarcode-0.4/ && \
+    make && \
+    make install
+
+ENV PIPX_HOME=/opt/pipx
+ENV PIPX_BIN_DIR=/usr/local/bin
+RUN pipx ensurepath && \
+    pipx install unoserver==2.0.1
+RUN npm install bower -g
+
+#For session data storage:
+RUN mkdir /home/www-session && \
+    chown www-data /home/www-session
+
+#For tmp upload files:
+RUN mkdir /home/apache && \
+    mkdir /home/apache/data && \
+    chown -R www-data /home/apache
+
+EXPOSE 80 443
